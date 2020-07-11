@@ -12,30 +12,32 @@ class AlertView: UIView {
     
     let titleLabel      = GHTitleLabel(textAlignment: .center, fontSize: 20)
     let messageLabel    = GHBodyLabel(textAlignment: .center)
-    let actionButton    = GHButton(backgroundColor: .systemPink, title: "Ok")
-    let dismissButton = UIButton(frame: UIScreen.main.bounds)
+    var actionButton    = GHButton()
+    var dismissButton   = UIButton()
 
     var alertTitle: String?
     var message: String?
     var buttonTitle: String?
-    
     let padding: CGFloat = 20
     
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
     
-    init(title: String, message: String, buttonTitle: String) {
+    init(title: String, message: String, buttonTitle: String, actionButton: GHButton, dismissButton: UIButton) {
         super.init(frame: .zero)
         self.alertTitle     = title
         self.message        = message
         self.buttonTitle    = buttonTitle
-        dismissButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.75)
-        
-        configureView()
-        configureTitleLabel()
-        configureActionButton()
-        configureMessageLabel()
+        self.actionButton   = actionButton
+        self.dismissButton  = dismissButton
+        DispatchQueue.main.async {
+            self.configureView()
+            self.configureTitleLabel()
+            self.configureActionButton()
+            self.configureMessageLabel()
+            self.createDismissButton()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -51,7 +53,6 @@ class AlertView: UIView {
         
     }
     
-    
     func configureTitleLabel() {
         self.addSubview(titleLabel)
         titleLabel.text = alertTitle ?? "Something went wrong"
@@ -64,11 +65,10 @@ class AlertView: UIView {
         ])
     }
     
-    
     func configureActionButton() {
         self.addSubview(actionButton)
         actionButton.setTitle(buttonTitle ?? "Ok", for: .normal)
-        actionButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
+        actionButton.addTarget(self, action: #selector(dismissVC(_:)), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             actionButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -padding),
@@ -78,12 +78,10 @@ class AlertView: UIView {
         ])
     }
     
-    
     func configureMessageLabel() {
         self.addSubview(messageLabel)
         messageLabel.text           = message ?? "Unable to complete request"
         messageLabel.numberOfLines  = 4
-        
         NSLayoutConstraint.activate([
             messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             messageLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: padding),
@@ -91,8 +89,17 @@ class AlertView: UIView {
             messageLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -12)
         ])
     }
-    @objc func dismissVC() {
+    
+    func createDismissButton() {
+        dismissButton.frame = UIScreen.main.bounds
+        dismissButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.75)
+        dismissButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
+    }
+
+    @objc func dismissVC(_ dismissButton: UIButton) {
         self.removeFromSuperview()
         dismissButton.removeFromSuperview()
     }
 }
+
+

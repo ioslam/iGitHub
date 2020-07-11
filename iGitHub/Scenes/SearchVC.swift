@@ -9,31 +9,34 @@
 import UIKit
 
 class SearchVC: UIViewController {
-    
     let gh_iv = UIImageView()
     let search_textfield = GHTextField()
     let search_button = GHButton(backgroundColor: .systemGreen, title: "Get User")
-    let alertView = AlertView(title: "Empty Username",
-                              message: "Please enter a username. We need to know who to look for 😀.",
-                              buttonTitle: "Ok")
+    let actionButton = GHButton(backgroundColor: .systemPink, title: "")
+    let dismissButton = UIButton()
+    
     var isUserTyped: Bool { return !search_textfield.text!.isEmpty }
     
+    //MARK: - DidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        createGHImage()
-        createSearchTextfield()
-        createSearchButton()
-        dismissKeyboard()
+        search_button.addTarget(self, action: #selector(searchButtonPressed), for: .touchUpInside)
+        DispatchQueue.main.async {
+            self.createGHImage()
+            self.createSearchTextfield()
+            self.createSearchButton()
+            self.dismissKeyboard()
+        }
     }
-    
+    //MARK: -  WillAppear
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        view.layoutIfNeeded()
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
 }
+
 //MARK: - UI
 extension SearchVC {
     
@@ -43,7 +46,7 @@ extension SearchVC {
         gh_iv.translatesAutoresizingMaskIntoConstraints = false
         gh_iv.image = UIImage(named: "gh-logo")!
         NSLayoutConstraint.activate([
-            gh_iv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 64),
+            gh_iv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
             gh_iv.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
             gh_iv.heightAnchor.constraint(equalToConstant: 200),
             gh_iv.widthAnchor.constraint(equalToConstant: 200)
@@ -73,44 +76,52 @@ extension SearchVC {
         ])
     }
     //MARK: - show alert view layout
-    func createAlertView() {
-        alertView.dismissButton.addTarget(self, action: #selector(dismissAlert), for: .touchUpInside)
-        view.addSubview(alertView.dismissButton)
-        view.addSubview(alertView)
-        NSLayoutConstraint.activate([
-            alertView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
-            alertView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
-            alertView.widthAnchor.constraint(equalToConstant: 280),
-            alertView.heightAnchor.constraint(equalToConstant: 220)
-        ])
-        
+    fileprivate func createAlertView() {
+        view.setAlertView(title: "Empty Username",
+                          message: "Please enter a username. We need to know who to look for 😀.",
+                          buttonTitle: "OK",
+                          actionButton: actionButton,
+                          dismissButton: dismissButton)
     }
-
+    //MARK: - IBActions & UIGesture Recognizer
+    
+    //MARK: - click anywhere in the view to dismiss the keyboard
     func dismissKeyboard() {
         let tab = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tab)
     }
+    //MARK: - Dismiss `Alert` View Action
     @objc func dismissAlert() {
-        alertView.dismissButton.removeFromSuperview()
-        alertView.removeFromSuperview()
+        
        }
-
+    //MARK: - Search Button Action
+    @objc func searchButtonPressed() {
+        validateTextfield()
+    }
 }
 
+//MARK: - UITextfield Delegates
 extension SearchVC: UITextFieldDelegate {
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         validateTextfield()
         return true
     }
+    //MARK: - validate if the username is not empty
     func validateTextfield() {
         guard isUserTyped else {
             createAlertView()
             return
         }
+        displayUserDetails()
+    }
+    //MARK: - go to user details vc to display
+    func displayUserDetails() {
         let userDetails = UserDetailsVC()
         userDetails.username = search_textfield.text
         navigationController?.pushViewController(userDetails, animated: true)
+        search_textfield.text = ""
     }
-    
+
 
 }
