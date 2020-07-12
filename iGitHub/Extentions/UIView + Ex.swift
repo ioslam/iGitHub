@@ -13,11 +13,12 @@ extension UIView {
     func setAlertView(title: String, message: String, buttonTitle: String, actionButton: GHButton, dismissButton: UIButton) {
         
         guard let superview = superview else { return }
-        let alertView = AlertView(title: title, message: message, buttonTitle: buttonTitle,actionButton: actionButton, dismissButton: dismissButton)
-        actionButton.addTarget(dismissButton, action: #selector(UIView.removeFromSuperview), for: .touchUpInside)
+        let alertView = AlertView(title: title,
+                                  message: message,
+                                  buttonTitle: buttonTitle,
+                                  actionButton: actionButton,
+                                  dismissButton: dismissButton)
         alertView.translatesAutoresizingMaskIntoConstraints = false
-        dismissButton.addTarget(dismissButton, action: #selector(UIView.removeFromSuperview) , for: .touchUpInside)
-        dismissButton.addTarget(alertView, action: #selector(UIView.removeFromSuperview) , for: .touchUpInside)
         superview.addSubview(dismissButton)
         superview.addSubview(alertView)
                 

@@ -15,7 +15,7 @@ class SearchVC: UIViewController {
     let actionButton = GHButton(backgroundColor: .systemPink, title: "")
     let dismissButton = UIButton()
     
-    var isUserTyped: Bool { return !search_textfield.text!.isEmpty }
+    var isUserExist: Bool { return !search_textfield.text!.isEmpty }
     
     //MARK: - DidLoad
     override func viewDidLoad() {
@@ -77,11 +77,23 @@ extension SearchVC {
     }
     //MARK: - show alert view layout
     fileprivate func createAlertView() {
-        view.setAlertView(title: "Empty Username",
-                          message: "Please enter a username. We need to know who to look for 😀.",
-                          buttonTitle: "OK",
-                          actionButton: actionButton,
-                          dismissButton: dismissButton)
+        dismissButton.addTarget(self, action: #selector(tabToDismiss), for: .touchUpInside)
+        actionButton.addTarget(self, action: #selector(tabToDismiss), for: .touchUpInside)
+        let alertView = AlertView(title: "Enter Username",
+                                  message: "Type something",
+                                  buttonTitle: "OK",
+                                  actionButton: actionButton,
+                                  dismissButton: dismissButton)
+        alertView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(dismissButton)
+        view.addSubview(alertView)
+        NSLayoutConstraint.activate([
+            alertView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
+            alertView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            alertView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            alertView.heightAnchor.constraint(equalToConstant: 220)
+        ])
+        
     }
     //MARK: - IBActions & UIGesture Recognizer
     
@@ -108,8 +120,8 @@ extension SearchVC: UITextFieldDelegate {
         return true
     }
     //MARK: - validate if the username is not empty
-    func validateTextfield() {
-        guard isUserTyped else {
+    fileprivate func validateTextfield() {
+        guard isUserExist else {
             createAlertView()
             return
         }
@@ -123,5 +135,7 @@ extension SearchVC: UITextFieldDelegate {
         search_textfield.text = ""
     }
 
-
+    @objc func tabToDismiss() {
+        print("rx0")
+       }
 }

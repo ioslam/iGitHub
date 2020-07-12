@@ -65,19 +65,6 @@ class AlertView: UIView {
         ])
     }
     
-    func configureActionButton() {
-        self.addSubview(actionButton)
-        actionButton.setTitle(buttonTitle ?? "Ok", for: .normal)
-        actionButton.addTarget(self, action: #selector(dismissVC(_:)), for: .touchUpInside)
-        
-        NSLayoutConstraint.activate([
-            actionButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -padding),
-            actionButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: padding),
-            actionButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -padding),
-            actionButton.heightAnchor.constraint(equalToConstant: 44)
-        ])
-    }
-    
     func configureMessageLabel() {
         self.addSubview(messageLabel)
         messageLabel.text           = message ?? "Unable to complete request"
@@ -89,14 +76,29 @@ class AlertView: UIView {
             messageLabel.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -12)
         ])
     }
+    //MARK: - `Action` Button
+    func configureActionButton() {
+        self.addSubview(actionButton)
+        actionButton.setTitle(buttonTitle ?? "Ok", for: .normal)
+        actionButton.addTarget(dismissButton, action: #selector(UIView.removeFromSuperview), for: .touchUpInside)
+        actionButton.addTarget(self, action: #selector(dismissFromSuperview), for: .touchUpInside)
+
+        NSLayoutConstraint.activate([
+            actionButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -padding),
+            actionButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: padding),
+            actionButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -padding),
+            actionButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+    }
     
+    //MARK: - `Dismiss` Button
     func createDismissButton() {
         dismissButton.frame = UIScreen.main.bounds
         dismissButton.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.75)
-        dismissButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
+        dismissButton.addTarget(self, action: #selector(dismissFromSuperview), for: .touchUpInside)
     }
 
-    @objc func dismissVC(_ dismissButton: UIButton) {
+    @objc func dismissFromSuperview(_ dismissButton: UIButton) {
         self.removeFromSuperview()
         dismissButton.removeFromSuperview()
     }

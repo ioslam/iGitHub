@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ErrorMessage: String {
+enum GHError: String, Error {
     case invalidURL       = "error, check url"
     case invalidUsername  = "error, check your username"
     case unableToComplete = "error, check your internet"
